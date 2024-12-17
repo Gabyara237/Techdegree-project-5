@@ -1,8 +1,10 @@
 package com.teamtreehouse.worldbank.model;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
+@Entity
 public class Country {
 
     @Id
@@ -10,9 +12,9 @@ public class Country {
     @Column
     private String name;
     @Column
-    private double internetUsers;
+    private Double internetUsers;
     @Column
-    private double adultLiteracyRate;
+    private Double adultLiteracyRate;
 
 
     // Default constructor for JPA
@@ -37,7 +39,7 @@ public class Country {
         this.name = name;
     }
 
-    public double getInternetUsers() {
+    public Double getInternetUsers() {
         return internetUsers;
     }
 
@@ -45,7 +47,7 @@ public class Country {
         this.internetUsers = internetUsers;
     }
 
-    public double getAdultLiteracyRate() {
+    public Double getAdultLiteracyRate() {
         return adultLiteracyRate;
     }
 
