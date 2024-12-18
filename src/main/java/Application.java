@@ -32,6 +32,49 @@ public class Application {
         createCountry();
         System.out.printf("%n%nList of countries: %n%n");
         fetchAllCountries();
+        deleteCountry();
+    }
+
+    private static void deleteCountry() {
+        Scanner scanner = new Scanner(System.in);
+        String countryCode="";
+        String confirmAnswer;
+        Country country;
+        country = findCountryByCode(countryCode);
+        while(true) {
+            System.out.println("Please enter the country code of the country you want to delete, it must be 3 characters long.");
+            countryCode = scanner.nextLine().toUpperCase().trim();
+
+            if(countryCode.length() == 3 ){
+
+                country = findCountryByCode(countryCode);
+                if(country!= null){
+                    while(true) {
+                        System.out.printf("Are you sure you want to delete the country %s with the code %s?. Type Y for 'Yes', and N for 'No'%n", country.getName(), country.getCode());
+                        confirmAnswer = scanner.nextLine().toUpperCase().trim();
+                        if (confirmAnswer.equals("Y")) {
+                            delete(country);
+                            System.out.printf("%nThank you for your confirmation, the country %s has been successfully deleted with the code %s.", country.getName(), country.getCode());
+
+                            break;
+                        } else if (confirmAnswer.equals("N")) {
+                            System.out.println("%nThank you for your confirmation, we will not proceed with the elimination of the country.");
+                            break;
+                        } else {
+                            System.out.println("%nInvalid Input.");
+                        }
+                    }
+                    break;
+
+                }else{
+                    System.out.println("Country code not found in the database.");
+                }
+
+            }else{
+                System.out.println("Invalid input. The code must be 3 letters.");
+            }
+        }
+
     }
 
     private static void createCountry(){
@@ -123,7 +166,7 @@ public class Application {
             printCountry(country);
 
             System.out.printf("%nDo you want to edit the country name? Type Y for 'Yes', and N for 'No'. %n");
-            input = scanner.nextLine().toUpperCase();
+            input = scanner.nextLine().toUpperCase().trim();
             if (input.equals("Y")) {
                 System.out.println("Please enter the name of the edited country");
                 newName= scanner.nextLine();
@@ -132,7 +175,7 @@ public class Application {
             }
 
             System.out.printf("%nDo you want to edit the internet users field? Type Y for 'Yes', and N for 'No'. %n");
-            input = scanner.nextLine().toUpperCase();
+            input = scanner.nextLine().toUpperCase().trim();
             if (input.equals("Y")) {
                 System.out.println("Please enter the edited value for internet users");
                 newInternetUsers= scanner.nextDouble();
@@ -141,7 +184,7 @@ public class Application {
             }
 
             System.out.println("Do you want to edit the adult literacy rate field? Type Y for 'Yes', and N for 'No'");
-            input = scanner.nextLine().toUpperCase();
+            input = scanner.nextLine().toUpperCase().trim();
             if (input.equals("Y")) {
                 System.out.println("Please enter the edited value for adult literacy rate.");
                 newAdultLiteracyRate= scanner.nextDouble();
@@ -172,6 +215,23 @@ public class Application {
         session.close();
 
         return country;
+    }
+
+    private static void delete(Country country) {
+        // Open a session
+        Session session = sessionFactory.openSession();
+
+        // Begin a transaction
+        session.beginTransaction();
+
+        // Use the session to update the contact
+        session.delete(country);
+
+        // Commit the transaction
+        session.getTransaction().commit();
+
+        // Close the session
+        session.close();
     }
 
     private static void update(Country country) {
