@@ -20,6 +20,13 @@ public class Country {
     // Default constructor for JPA
     public Country(){}
 
+    public Country(CountryBuilder builder) {
+        this.code = builder.code;
+        this.name = builder.name;
+        this.internetUsers = builder.internetUsers;
+        this.adultLiteracyRate = builder.adultLiteracyRate;
+    }
+
 
     // #######  Getters and Setters ######
 
@@ -53,5 +60,35 @@ public class Country {
 
     public void setAdultLiteracyRate(double adultLiteracyRate) {
         this.adultLiteracyRate = adultLiteracyRate;
+    }
+
+    public static class CountryBuilder {
+        private String code;
+        private String name;
+        private Double internetUsers;
+        private Double adultLiteracyRate;
+
+        public CountryBuilder(String code) {
+            this.code = code;
+        }
+
+        public CountryBuilder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public CountryBuilder withInternetUsers(Double internetUsers) {
+            this.internetUsers = internetUsers;
+            return this;
+        }
+
+        public CountryBuilder withAdultLiteracyRate(Double adultLiteracyRate) {
+            this.adultLiteracyRate = adultLiteracyRate;
+            return this;
+        }
+
+        public Country build() {
+            return new Country(this);
+        }
     }
 }

@@ -29,7 +29,79 @@ public class Application {
         List<Country> countries = fetchAllCountries();
         dataAnalysis(countries);
         editCountry();
+        createCountry();
+        System.out.printf("%n%nList of countries: %n%n");
+        fetchAllCountries();
     }
+
+    private static void createCountry(){
+       Scanner scanner = new Scanner(System.in);
+        String code;
+        String nameCountry;
+        Double internetUsers;
+        Double adultLiteracyRate;
+
+
+        while(true) {
+            System.out.println("Please enter the country code, it must be 3 characters long.");
+            code = scanner.nextLine().toUpperCase().trim();
+
+            if(code.length() == 3 ){
+                break;
+            }else{
+                System.out.println("Invalid input. The code must be 3 letters.");
+            }
+        }
+
+        while(true) {
+            System.out.println("Please enter the country name.");
+            nameCountry = scanner.nextLine();
+
+            if (!nameCountry.isEmpty()){
+                break;
+            }else{
+                System.out.println("Invalid input. The name must not be empty.");
+            }
+        }
+
+        while(true) {
+            System.out.println("Please enter the value for the indicator internet users.");
+            if(scanner.hasNextDouble()){
+                internetUsers = scanner.nextDouble();
+                scanner.nextLine();
+                if(internetUsers > 0){
+                    break;
+                }else{
+                    System.out.println("Invalid input. The value must be a positive number.");
+
+                }
+            }else{
+                System.out.println("Invalid input. The input must be a numerical value.");
+
+            }
+        }
+        while(true) {
+            System.out.println("Please enter the value for adult literacy rate.");
+            if(true) {
+                adultLiteracyRate = scanner.nextDouble();
+                scanner.nextLine();
+                if(adultLiteracyRate > 0){
+                    break;
+                }else{
+                    System.out.println("Invalid input. The value must be a positive number.");
+                }
+            }else{
+                System.out.println("Invalid input. The input must be a numerical value.");
+            }
+        }
+        Country country = new Country.CountryBuilder(code)
+                .withName(nameCountry)
+                .withInternetUsers(internetUsers)
+                .withAdultLiteracyRate(adultLiteracyRate)
+                .build();
+        save(country);
+    }
+
 
     private static void editCountry() {
         Scanner scanner = new Scanner(System.in);
@@ -38,7 +110,7 @@ public class Application {
         String input;
         String newName;
         Double newInternetUsers;
-        Double newAdultliteracyRate;
+        Double newAdultLiteracyRate;
 
         System.out.println("Please enter the country code you want to edit");
         countryCode = scanner.nextLine().toUpperCase();
@@ -72,9 +144,9 @@ public class Application {
             input = scanner.nextLine().toUpperCase();
             if (input.equals("Y")) {
                 System.out.println("Please enter the edited value for adult literacy rate.");
-                newAdultliteracyRate= scanner.nextDouble();
+                newAdultLiteracyRate= scanner.nextDouble();
                 scanner.nextLine();
-                country.setAdultLiteracyRate(newAdultliteracyRate);
+                country.setAdultLiteracyRate(newAdultLiteracyRate);
             }
 
             update(country);
@@ -111,6 +183,23 @@ public class Application {
 
         // Use the session to update the contact
         session.update(country);
+
+        // Commit the transaction
+        session.getTransaction().commit();
+
+        // Close the session
+        session.close();
+    }
+
+    private static void save(Country country) {
+        // Open a session
+        Session session = sessionFactory.openSession();
+
+        // Begin a transaction
+        session.beginTransaction();
+
+        // Use the session to save the contact
+        session.save(country);
 
         // Commit the transaction
         session.getTransaction().commit();
@@ -167,6 +256,20 @@ public class Application {
     private static void dataAnalysis(List<Country> countries) {
         List<Double> internetUsers = new ArrayList<>();
         List<Double> adultLiteracyRate = new ArrayList<>();
+        List<String> codeCountriesInternetUsers = new ArrayList<>();
+        List<String> codeCountriesAdultLiteracyRate = new ArrayList<>();
+
+        String codeCountryMaxInternetUsers;
+        String codeCountryMinInternetUsers;
+
+        String codeCountryMaxAdultLiteracyRate;
+        String codeCountryMinAdultLiteracyRate;
+
+        int indexMaxInternetUser;
+        int indexMinInternetUser;
+        int indexMaxAdultLiteracyRate;
+        int indexMinAdultLiteracyRate;
+
         Double maxInternetUserValue;
         Double minInternetUserValue;
         Double maxAdultLiteracyRate;
@@ -174,23 +277,41 @@ public class Application {
         for (Country country:countries){
             if(country.getInternetUsers() != null) {
                 internetUsers.add(country.getInternetUsers());
+                codeCountriesInternetUsers.add(country.getCode());
             }
             if (country.getAdultLiteracyRate() != null) {
                 adultLiteracyRate.add(country.getAdultLiteracyRate());
+                codeCountriesAdultLiteracyRate.add(country.getCode());
             }
         }
 
+        // We obtain the maximum value of the Internet User indicator and the associated country code.
         maxInternetUserValue = Collections.max(internetUsers);
-        minInternetUserValue = Collections.min(internetUsers);
+        indexMaxInternetUser = internetUsers.indexOf(maxInternetUserValue);
+        codeCountryMaxInternetUsers = codeCountriesInternetUsers.get(indexMaxInternetUser);
 
+        // We obtain the minimum value of the Internet User indicator and the associated country code.
+        minInternetUserValue = Collections.min(internetUsers);
+        indexMinInternetUser = internetUsers.indexOf(minInternetUserValue);
+        codeCountryMinInternetUsers = codeCountriesInternetUsers.get(indexMinInternetUser);
+
+
+        // We obtain the maximum value of the Adult Literacy Rate indicator and the associated country code.
         maxAdultLiteracyRate = Collections.max(adultLiteracyRate);
+        indexMaxAdultLiteracyRate = adultLiteracyRate.indexOf(maxAdultLiteracyRate);
+        codeCountryMaxAdultLiteracyRate = codeCountriesAdultLiteracyRate.get(indexMaxAdultLiteracyRate);
+
+
+        // We obtain the minimum value of the Adult Literacy Rate indicator and the associated country code.
         minAdultLiteracyRate = Collections.min(adultLiteracyRate);
+        indexMinAdultLiteracyRate = adultLiteracyRate.indexOf(minAdultLiteracyRate);
+        codeCountryMinAdultLiteracyRate = codeCountriesAdultLiteracyRate.get(indexMinAdultLiteracyRate);
 
         System.out.printf("\n\n%50s\n\n", "DATA ANALYSIS");
         System.out.printf("%-20s %22s %22s\n", "Indicator", "Maximum", "Minimum");
         System.out.println("----------------------------------------------------------------------------------------------");
-        System.out.printf("%-20s %20s %20s\n", "Internet Users", String.format("%.2f",maxInternetUserValue), String.format("%.2f",minInternetUserValue) );
-        System.out.printf("%-20s %20s %20s\n", "Adult Literacy Rate", String.format("%.2f",maxAdultLiteracyRate), String.format("%.2f",minAdultLiteracyRate) );
+        System.out.printf("%-20s %25s %20s\n", "Internet Users", String.format("%.2f",maxInternetUserValue)+"("+codeCountryMaxInternetUsers+")", String.format("%.2f",minInternetUserValue)+"("+codeCountryMinInternetUsers+")" );
+        System.out.printf("%-20s %25s %20s\n", "Adult Literacy Rate", String.format("%.2f",maxAdultLiteracyRate)+"("+codeCountryMaxAdultLiteracyRate+")", String.format("%.2f",minAdultLiteracyRate)+"("+codeCountryMinAdultLiteracyRate+")" );
 
 
     }
