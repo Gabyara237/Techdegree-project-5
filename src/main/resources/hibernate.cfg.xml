@@ -10,6 +10,9 @@
         <!-- SQL dialect -->
         <property name="dialect">org.hibernate.dialect.H2Dialect</property>
 
+        <!-- Update the database schema on startup -->
+        <property name="hbm2ddl.auto">update</property>
+
         <!-- Show the queries prepared by Hibernate -->
         <property name="show_sql">true</property>
 

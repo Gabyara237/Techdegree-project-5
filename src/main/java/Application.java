@@ -8,10 +8,7 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
 public class Application {
@@ -26,12 +23,120 @@ public class Application {
 
     public static void main(String[] args) {
 
+
         // Display a list of countries
         System.out.printf("%n%nList of countries: %n%n");
         List<Country> countries = fetchAllCountries();
         dataAnalysis(countries);
+        editCountry();
     }
 
+    private static void editCountry() {
+        Scanner scanner = new Scanner(System.in);
+        String countryCode;
+        Country country;
+        String input;
+        String newName;
+        Double newInternetUsers;
+        Double newAdultliteracyRate;
+
+        System.out.println("Please enter the country code you want to edit");
+        countryCode = scanner.nextLine().toUpperCase();
+
+        country = findCountryByCode(countryCode);
+
+        if (country!=null) {
+            System.out.printf("%-15s %-30s %20s %25s\n", "Code", "Name", "Internet User", "Adult Literacy Rate");
+            System.out.println("----------------------------------------------------------------------------------------------");
+            printCountry(country);
+
+            System.out.printf("%nDo you want to edit the country name? Type Y for 'Yes', and N for 'No'. %n");
+            input = scanner.nextLine().toUpperCase();
+            if (input.equals("Y")) {
+                System.out.println("Please enter the name of the edited country");
+                newName= scanner.nextLine();
+
+                country.setName(newName);
+            }
+
+            System.out.printf("%nDo you want to edit the internet users field? Type Y for 'Yes', and N for 'No'. %n");
+            input = scanner.nextLine().toUpperCase();
+            if (input.equals("Y")) {
+                System.out.println("Please enter the edited value for internet users");
+                newInternetUsers= scanner.nextDouble();
+                scanner.nextLine();
+                country.setInternetUsers(newInternetUsers);
+            }
+
+            System.out.println("Do you want to edit the adult literacy rate field? Type Y for 'Yes', and N for 'No'");
+            input = scanner.nextLine().toUpperCase();
+            if (input.equals("Y")) {
+                System.out.println("Please enter the edited value for adult literacy rate.");
+                newAdultliteracyRate= scanner.nextDouble();
+                scanner.nextLine();
+                country.setAdultLiteracyRate(newAdultliteracyRate);
+            }
+
+            update(country);
+
+            System.out.println("Country successfully edited");
+            System.out.printf("%-15s %-30s %20s %25s\n", "Code", "Name", "Internet User", "Adult Literacy Rate");
+            System.out.println("----------------------------------------------------------------------------------------------");
+            printCountry(country);
+
+
+        }else{
+            System.out.printf("Incorrect country code, please try again.");
+        }
+
+    }
+
+    private static Country findCountryByCode(String countryCode) {
+
+        Session session = sessionFactory.openSession();
+
+        Country country = session.get(Country.class,countryCode);
+
+        session.close();
+
+        return country;
+    }
+
+    private static void update(Country country) {
+        // Open a session
+        Session session = sessionFactory.openSession();
+
+        // Begin a transaction
+        session.beginTransaction();
+
+        // Use the session to update the contact
+        session.update(country);
+
+        // Commit the transaction
+        session.getTransaction().commit();
+
+        // Close the session
+        session.close();
+    }
+
+    private static void printCountry(Country country){
+        String adultLiteracyRate ="";
+        String internetUser ="";
+        if (country.getAdultLiteracyRate() == null){
+            adultLiteracyRate = "--";
+        }else{
+            adultLiteracyRate = String.format("%.2f",country.getAdultLiteracyRate());
+        }
+
+        if (country.getInternetUsers() == null){
+            internetUser = "--";
+        }else{
+            internetUser = String.format("%.2f",country.getInternetUsers());
+        }
+
+        System.out.printf("%-10s %-30s %20s %25s\n", country.getCode(),country.getName(),internetUser, adultLiteracyRate);
+
+    }
 
     @SuppressWarnings("unchecked")
     private static List<Country> fetchAllCountries() {
@@ -53,20 +158,7 @@ public class Application {
 
             for(Country country : countries){
 
-                if (country.getAdultLiteracyRate() == null){
-                    adultLiteracyRate = "--";
-                }else{
-                    adultLiteracyRate = String.format("%.2f",country.getAdultLiteracyRate());
-                }
-
-                if (country.getInternetUsers() == null){
-                    internetUser = "--";
-                }else{
-                    internetUser = String.format("%.2f",country.getInternetUsers());
-                }
-
-                System.out.printf("%-10s %-30s %20s %25s\n", country.getCode(),country.getName(),internetUser, adultLiteracyRate);
-
+                printCountry(country);
             }
             return countries;
         }
