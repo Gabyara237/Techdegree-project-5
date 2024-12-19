@@ -23,24 +23,58 @@ public class Application {
 
     public static void main(String[] args) {
 
+        Scanner scanner = new Scanner(System.in);
+        int option =0;
+        while(option != 6) {
+            System.out.printf("%n##########  Menu  ##########%n");
+            System.out.println("1. Display existing countries.");
+            System.out.println("2. Edit country.");
+            System.out.println("3. Add country.");
+            System.out.println("4. Delete country.");
+            System.out.println("5. Display data analysis.");
+            System.out.println("6. Exit.");
 
-        // Display a list of countries
-        System.out.printf("%n%nList of countries: %n%n");
-        List<Country> countries = fetchAllCountries();
-        dataAnalysis(countries);
-        editCountry();
-        createCountry();
-        System.out.printf("%n%nList of countries: %n%n");
-        fetchAllCountries();
-        deleteCountry();
+            if (scanner.hasNextInt()){
+                option = scanner.nextInt();
+                scanner.nextLine();
+                switch (option){
+                    case 1:
+                        System.out.println("Selected option: Display existing countries.");
+                        System.out.printf("%n%nList of countries: %n%n");
+                        displayAllCountries();
+                        break;
+                    case 2:
+                        System.out.println("Selected option: Edit country.");
+                        editCountry();
+                        break;
+                    case 3:
+                        System.out.println("Selected option: Add country.");
+                        createCountry();
+                        break;
+                    case 4:
+                        System.out.println("Selected option: Delete country.");
+                        deleteCountry();
+                        break;
+                    case 5:
+                        System.out.println("Selected option: Display data analysis.");
+                        dataAnalysis();
+                        break;
+                    case 6:
+                        System.out.println("Selected option: Exit.");
+                        break;
+
+                }
+            }
+        }
     }
+
+
 
     private static void deleteCountry() {
         Scanner scanner = new Scanner(System.in);
         String countryCode="";
         String confirmAnswer;
         Country country;
-        country = findCountryByCode(countryCode);
         while(true) {
             System.out.println("Please enter the country code of the country you want to delete, it must be 3 characters long.");
             countryCode = scanner.nextLine().toUpperCase().trim();
@@ -125,7 +159,7 @@ public class Application {
         }
         while(true) {
             System.out.println("Please enter the value for adult literacy rate.");
-            if(true) {
+            if(scanner.hasNextDouble()) {
                 adultLiteracyRate = scanner.nextDouble();
                 scanner.nextLine();
                 if(adultLiteracyRate > 0){
@@ -143,6 +177,10 @@ public class Application {
                 .withAdultLiteracyRate(adultLiteracyRate)
                 .build();
         save(country);
+        System.out.println("Country successfully added");
+        System.out.printf("%-15s %-30s %20s %25s\n", "Code", "Name", "Internet User", "Adult Literacy Rate");
+        System.out.println("----------------------------------------------------------------------------------------------");
+        printCountry(country);
     }
 
 
@@ -155,55 +193,85 @@ public class Application {
         Double newInternetUsers;
         Double newAdultLiteracyRate;
 
-        System.out.println("Please enter the country code you want to edit");
-        countryCode = scanner.nextLine().toUpperCase();
+        while(true) {
+            System.out.println("Please enter the country code you want to edit");
+            countryCode = scanner.nextLine().toUpperCase();
 
-        country = findCountryByCode(countryCode);
+            country = findCountryByCode(countryCode);
 
-        if (country!=null) {
-            System.out.printf("%-15s %-30s %20s %25s\n", "Code", "Name", "Internet User", "Adult Literacy Rate");
-            System.out.println("----------------------------------------------------------------------------------------------");
-            printCountry(country);
+            if (country != null) {
+                System.out.printf("%nCountry you want to edit:%n%n");
+                System.out.printf("%-15s %-30s %20s %25s\n", "Code", "Name", "Internet User", "Adult Literacy Rate");
+                System.out.println("----------------------------------------------------------------------------------------------");
+                printCountry(country);
 
-            System.out.printf("%nDo you want to edit the country name? Type Y for 'Yes', and N for 'No'. %n");
-            input = scanner.nextLine().toUpperCase().trim();
-            if (input.equals("Y")) {
-                System.out.println("Please enter the name of the edited country");
-                newName= scanner.nextLine();
+                while (true) {
+                    System.out.printf("%nDo you want to edit the country name? Type Y for 'Yes', and N for 'No'. %n");
+                    input = scanner.nextLine().toUpperCase().trim();
+                    if (input.equals("Y")) {
+                        while (true) {
+                            System.out.println("Please enter the name of the edited country");
+                            newName = scanner.nextLine();
+                            if (newName.isEmpty() || newName.isBlank()) {
+                                System.out.println("Invalid input. The name cannot be empty or contain only whitespace.");
+                            } else {
+                                country.setName(newName);
+                                break;
+                            }
+                        }
+                        break;
+                    } else if (input.equals("N")) {
+                        break;
+                    }else{
+                        System.out.println("Incorrect option selected.");
+                    }
+                }
 
-                country.setName(newName);
+                while (true) {
+                    System.out.printf("%nDo you want to edit the internet users field? Type Y for 'Yes', and N for 'No'. %n");
+                    input = scanner.nextLine().toUpperCase().trim();
+                    if (input.equals("Y")) {
+                        System.out.println("Please enter the edited value for internet users");
+                        newInternetUsers = scanner.nextDouble();
+                        scanner.nextLine();
+                        country.setInternetUsers(newInternetUsers);
+                        break;
+                    } else if (input.equals("N")) {
+                        break;
+                    }else{
+                        System.out.println("Incorrect option selected.");
+                    }
+                }
+
+                while (true) {
+                    System.out.println("Do you want to edit the adult literacy rate field? Type Y for 'Yes', and N for 'No'");
+                    input = scanner.nextLine().toUpperCase().trim();
+                    if (input.equals("Y")) {
+                        System.out.println("Please enter the edited value for adult literacy rate.");
+                        newAdultLiteracyRate = scanner.nextDouble();
+                        scanner.nextLine();
+                        country.setAdultLiteracyRate(newAdultLiteracyRate);
+                        break;
+                    } else if (input.equals("N")) {
+                        break;
+                    }else{
+                        System.out.println("Incorrect option selected.");
+                    }
+                }
+
+                update(country);
+
+                System.out.println("Country successfully edited");
+                System.out.printf("%-15s %-30s %20s %25s\n", "Code", "Name", "Internet User", "Adult Literacy Rate");
+                System.out.println("----------------------------------------------------------------------------------------------");
+                printCountry(country);
+
+                break;
+            } else {
+                System.out.println("Incorrect country code.");
             }
 
-            System.out.printf("%nDo you want to edit the internet users field? Type Y for 'Yes', and N for 'No'. %n");
-            input = scanner.nextLine().toUpperCase().trim();
-            if (input.equals("Y")) {
-                System.out.println("Please enter the edited value for internet users");
-                newInternetUsers= scanner.nextDouble();
-                scanner.nextLine();
-                country.setInternetUsers(newInternetUsers);
-            }
-
-            System.out.println("Do you want to edit the adult literacy rate field? Type Y for 'Yes', and N for 'No'");
-            input = scanner.nextLine().toUpperCase().trim();
-            if (input.equals("Y")) {
-                System.out.println("Please enter the edited value for adult literacy rate.");
-                newAdultLiteracyRate= scanner.nextDouble();
-                scanner.nextLine();
-                country.setAdultLiteracyRate(newAdultLiteracyRate);
-            }
-
-            update(country);
-
-            System.out.println("Country successfully edited");
-            System.out.printf("%-15s %-30s %20s %25s\n", "Code", "Name", "Internet User", "Adult Literacy Rate");
-            System.out.println("----------------------------------------------------------------------------------------------");
-            printCountry(country);
-
-
-        }else{
-            System.out.printf("Incorrect country code, please try again.");
         }
-
     }
 
     private static Country findCountryByCode(String countryCode) {
@@ -289,8 +357,6 @@ public class Application {
 
     @SuppressWarnings("unchecked")
     private static List<Country> fetchAllCountries() {
-        String adultLiteracyRate ="";
-        String internetUser ="";
 
         try(Session session = sessionFactory.openSession()){
             CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -300,20 +366,25 @@ public class Application {
 
             criteriaQuery.select(root);
 
-            List<Country> countries = session.createQuery(criteriaQuery).getResultList();
-
-            System.out.printf("%-15s %-30s %20s %25s\n", "Code", "Name" , "Internet User","Adult Literacy Rate");
-            System.out.println("----------------------------------------------------------------------------------------------");
-
-            for(Country country : countries){
-
-                printCountry(country);
-            }
-            return countries;
+            return session.createQuery(criteriaQuery).getResultList();
         }
     }
 
-    private static void dataAnalysis(List<Country> countries) {
+    private static void displayAllCountries(){
+
+        List<Country> countries= fetchAllCountries();
+        System.out.printf("%-15s %-30s %20s %25s\n", "Code", "Name" , "Internet User","Adult Literacy Rate");
+        System.out.println("----------------------------------------------------------------------------------------------");
+
+        for(Country country : countries){
+
+            printCountry(country);
+        }
+    }
+
+    private static void dataAnalysis() {
+        List<Country> countries = fetchAllCountries();
+
         List<Double> internetUsers = new ArrayList<>();
         List<Double> adultLiteracyRate = new ArrayList<>();
         List<String> codeCountriesInternetUsers = new ArrayList<>();
