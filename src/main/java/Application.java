@@ -26,7 +26,7 @@ public class Application {
         Scanner scanner = new Scanner(System.in);
         int option =0;
         while(option != 6) {
-            System.out.printf("%n##########  Menu  ##########%n");
+            System.out.printf("%n%n --------  Menu --------   %n%n");
             System.out.println("1. Display existing countries.");
             System.out.println("2. Edit country.");
             System.out.println("3. Add country.");
@@ -385,64 +385,50 @@ public class Application {
     private static void dataAnalysis() {
         List<Country> countries = fetchAllCountries();
 
-        List<Double> internetUsers = new ArrayList<>();
-        List<Double> adultLiteracyRate = new ArrayList<>();
-        List<String> codeCountriesInternetUsers = new ArrayList<>();
-        List<String> codeCountriesAdultLiteracyRate = new ArrayList<>();
 
-        String codeCountryMaxInternetUsers;
-        String codeCountryMinInternetUsers;
+        Optional<Country> maxInternetUserCountry = countries.stream()
+                .filter(country -> country.getInternetUsers() !=null)
+                .max(Comparator.comparing(Country::getInternetUsers));
 
-        String codeCountryMaxAdultLiteracyRate;
-        String codeCountryMinAdultLiteracyRate;
-
-        int indexMaxInternetUser;
-        int indexMinInternetUser;
-        int indexMaxAdultLiteracyRate;
-        int indexMinAdultLiteracyRate;
-
-        Double maxInternetUserValue;
-        Double minInternetUserValue;
-        Double maxAdultLiteracyRate;
-        Double minAdultLiteracyRate;
-        for (Country country:countries){
-            if(country.getInternetUsers() != null) {
-                internetUsers.add(country.getInternetUsers());
-                codeCountriesInternetUsers.add(country.getCode());
-            }
-            if (country.getAdultLiteracyRate() != null) {
-                adultLiteracyRate.add(country.getAdultLiteracyRate());
-                codeCountriesAdultLiteracyRate.add(country.getCode());
-            }
-        }
-
-        // We obtain the maximum value of the Internet User indicator and the associated country code.
-        maxInternetUserValue = Collections.max(internetUsers);
-        indexMaxInternetUser = internetUsers.indexOf(maxInternetUserValue);
-        codeCountryMaxInternetUsers = codeCountriesInternetUsers.get(indexMaxInternetUser);
-
-        // We obtain the minimum value of the Internet User indicator and the associated country code.
-        minInternetUserValue = Collections.min(internetUsers);
-        indexMinInternetUser = internetUsers.indexOf(minInternetUserValue);
-        codeCountryMinInternetUsers = codeCountriesInternetUsers.get(indexMinInternetUser);
+        Optional<Country> minInternetUserCountry = countries.stream()
+                .filter(country -> country.getInternetUsers() !=null)
+                .min(Comparator.comparing(Country::getInternetUsers));
 
 
-        // We obtain the maximum value of the Adult Literacy Rate indicator and the associated country code.
-        maxAdultLiteracyRate = Collections.max(adultLiteracyRate);
-        indexMaxAdultLiteracyRate = adultLiteracyRate.indexOf(maxAdultLiteracyRate);
-        codeCountryMaxAdultLiteracyRate = codeCountriesAdultLiteracyRate.get(indexMaxAdultLiteracyRate);
+        Optional<Country> maxAdultLiteracyRate = countries.stream()
+                .filter(country -> country.getAdultLiteracyRate() !=null)
+                .max(Comparator.comparing(Country::getAdultLiteracyRate));
 
+        Optional<Country> minAdultLiteracyRate = countries.stream()
+                .filter(country -> country.getAdultLiteracyRate() != null)
+                .min(Comparator.comparing(Country::getAdultLiteracyRate));
 
-        // We obtain the minimum value of the Adult Literacy Rate indicator and the associated country code.
-        minAdultLiteracyRate = Collections.min(adultLiteracyRate);
-        indexMinAdultLiteracyRate = adultLiteracyRate.indexOf(minAdultLiteracyRate);
-        codeCountryMinAdultLiteracyRate = codeCountriesAdultLiteracyRate.get(indexMinAdultLiteracyRate);
 
         System.out.printf("\n\n%50s\n\n", "DATA ANALYSIS");
         System.out.printf("%-20s %22s %22s\n", "Indicator", "Maximum", "Minimum");
         System.out.println("----------------------------------------------------------------------------------------------");
-        System.out.printf("%-20s %25s %20s\n", "Internet Users", String.format("%.2f",maxInternetUserValue)+"("+codeCountryMaxInternetUsers+")", String.format("%.2f",minInternetUserValue)+"("+codeCountryMinInternetUsers+")" );
-        System.out.printf("%-20s %25s %20s\n", "Adult Literacy Rate", String.format("%.2f",maxAdultLiteracyRate)+"("+codeCountryMaxAdultLiteracyRate+")", String.format("%.2f",minAdultLiteracyRate)+"("+codeCountryMinAdultLiteracyRate+")" );
+
+
+        maxInternetUserCountry.ifPresent(maxCountry ->
+                minInternetUserCountry.ifPresent(minCountry ->
+                        System.out.printf("%-20s %25s %20s %n",
+                                "Internet Users",
+                                String.format("%.2f",maxCountry.getInternetUsers()) + " (" + maxCountry.getCode() + ")" ,
+                                String.format("%.2f",minCountry.getInternetUsers())+" ("+ minCountry.getCode() + ")" )
+                )
+        );
+
+
+        maxAdultLiteracyRate.ifPresent(maxCountry ->
+                minAdultLiteracyRate.ifPresent(minCountry ->
+                        System.out.printf("%-20s %25s %20s %n",
+                                "Adult Literacy Rate",
+                                String.format("%.2f",maxCountry.getAdultLiteracyRate())+" ("+ maxCountry.getCode()+")",
+                                String.format("%.2f",minCountry.getAdultLiteracyRate())+" ("+ minCountry.getCode()+")" )
+
+                )
+
+        );
 
 
     }
