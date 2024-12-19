@@ -39,6 +39,7 @@ public class Application {
             System.out.println("6. Display the average.");
             System.out.println("7. Exit.");
 
+            System.out.printf("%nEnter your option: ");
             if (scanner.hasNextInt()) {
                 option = scanner.nextInt();
                 scanner.nextLine();
