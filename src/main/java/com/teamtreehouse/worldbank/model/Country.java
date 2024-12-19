@@ -62,6 +62,7 @@ public class Country {
         this.adultLiteracyRate = adultLiteracyRate;
     }
 
+    //  Builder Pattern
     public static class CountryBuilder {
         private String code;
         private String name;
