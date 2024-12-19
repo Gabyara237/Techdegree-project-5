@@ -25,14 +25,15 @@ public class Application {
 
         Scanner scanner = new Scanner(System.in);
         int option =0;
-        while(option != 6) {
+        while(option != 7) {
             System.out.printf("%n%n --------  Menu --------   %n%n");
             System.out.println("1. Display existing countries.");
             System.out.println("2. Edit country.");
             System.out.println("3. Add country.");
             System.out.println("4. Delete country.");
             System.out.println("5. Display data analysis.");
-            System.out.println("6. Exit.");
+            System.out.println("6. Display the average.");
+            System.out.println("7. Exit.");
 
             if (scanner.hasNextInt()){
                 option = scanner.nextInt();
@@ -59,7 +60,13 @@ public class Application {
                         System.out.println("Selected option: Display data analysis.");
                         dataAnalysis();
                         break;
+
                     case 6:
+                        System.out.println("Selected option: Calculate and display the average. ");
+                        calculateDisplayAverage();
+                        break;
+
+                    case 7:
                         System.out.println("Selected option: Exit.");
                         break;
 
@@ -68,6 +75,28 @@ public class Application {
         }
     }
 
+    private static void calculateDisplayAverage() {
+        List<Country> countries =  fetchAllCountries();
+
+        double averageInternetUsers = countries.stream()
+                .filter(country -> country.getInternetUsers()!= null)
+                .mapToDouble(Country::getInternetUsers)
+                .average()
+                .orElse(0.0);
+
+        double averageAdultLiteracyRate = countries.stream()
+                .filter(country -> country.getAdultLiteracyRate() !=null)
+                .mapToDouble(Country::getAdultLiteracyRate)
+                .average()
+                .orElse(0.0);
+
+        System.out.printf("%n%n%50s%n%n", "AVERAGE VALUE FOR EACH INDICATOR");
+        System.out.printf("%-20s %22s %n", "Indicator", "Average");
+        System.out.println("----------------------------------------------------------------------------------------------");
+        System.out.printf("%-20s %20s %n", "Internet Users", String.format("%.2f",averageInternetUsers));
+        System.out.printf("%-20s %20s %n", "Adult Literacy Rate", String.format("%.2f", averageAdultLiteracyRate));
+
+    }
 
 
     private static void deleteCountry() {
@@ -178,7 +207,7 @@ public class Application {
                 .build();
         save(country);
         System.out.println("Country successfully added");
-        System.out.printf("%-15s %-30s %20s %25s\n", "Code", "Name", "Internet User", "Adult Literacy Rate");
+        System.out.printf("%-15s %-30s %20s %25s%n", "Code", "Name", "Internet User", "Adult Literacy Rate");
         System.out.println("----------------------------------------------------------------------------------------------");
         printCountry(country);
     }
@@ -404,8 +433,8 @@ public class Application {
                 .min(Comparator.comparing(Country::getAdultLiteracyRate));
 
 
-        System.out.printf("\n\n%50s\n\n", "DATA ANALYSIS");
-        System.out.printf("%-20s %22s %22s\n", "Indicator", "Maximum", "Minimum");
+        System.out.printf("%n%n%50s%n%n", "DATA ANALYSIS");
+        System.out.printf("%-20s %22s %22s%n", "Indicator", "Maximum", "Minimum");
         System.out.println("----------------------------------------------------------------------------------------------");
 
 
